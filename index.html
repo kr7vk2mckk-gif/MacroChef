@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacroChef</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+:root{
+  --green:#198754;
+  --dark:#17251d;
+  --soft:#f4f8f5;
+  --card:#ffffff;
+  --border:#dfe9e2;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--soft);
+  color:var(--dark);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.navbar{
+  background:#fff;
+  border-bottom:1px solid var(--border);
+}
+
+.brand{
+  font-size:1.5rem;
+  font-weight:800;
+  color:var(--green);
+}
+
+.hero{
+  padding:55px 0 35px;
+}
+
+.hero h1{
+  font-weight:800;
+  font-size:clamp(2.3rem,6vw,4.5rem);
+  letter-spacing:-2px;
+}
+
+.hero p{
+  color:#65736a;
+  max-width:650px;
+  font-size:1.08rem;
+}
+
+.section-title{
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.filter-box{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:28px;
+}
+
+.btn-goal{
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--dark);
+  border-radius:12px;
+  padding:11px 18px;
+  font-weight:700;
+}
+
+.btn-goal.active,
+.btn-goal:hover{
+  background:var(--green);
+  color:#fff;
+  border-color:var(--green);
+}
+
+.recipe-card{
+  height:100%;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  transition:.2s ease;
+  cursor:pointer;
+}
+
+.recipe-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 35px rgba(25,135,84,.10);
+}
+
+.recipe-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.recipe-card h3{
+  font-size:1.15rem;
+  font-weight:800;
+  margin:0;
+}
+
+.favorite{
+  border:0;
+  background:transparent;
+  font-size:1.3rem;
+  color:#9aa69e;
+}
+
+.favorite.active{
+  color:#198754;
+}
+
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:14px 0;
+}
+
+.tag{
+  background:#eef6f0;
+  color:#27744c;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:.75rem;
+  font-weight:700;
+}
+
+.macro-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:16px;
+}
+
+.macro{
+  background:#f5f8f6;
+  border-radius:10px;
+  padding:8px 5px;
+  text-align:center;
+}
+
+.macro strong{
+  display:block;
+  font-size:.9rem;
+}
+
+.macro span{
+  color:#78837c;
+  font-size:.68rem;
+}
+
+.empty{
+  text-align:center;
+  padding:60px 20px;
+  color:#77837b;
+}
+
+.modal-content{
+  border:0;
+  border-radius:24px;
+}
+
+.modal-header{
+  border-bottom:1px solid var(--border);
+}
+
+.ingredient{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:8px 0;
+  border-bottom:1px solid #edf2ee;
+}
+
+.method-step{
+  padding:10px 0;
+}
+
+.planner{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+}
+
+.day{
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:15px;
+  margin-bottom:12px;
+}
+
+footer{
+  margin-top:70px;
+  padding:35px 0;
+  border-top:1px solid var(--border);
+  color:#718078;
+}
+
+@media(max-width:600px){
+  .macro-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar sticky-top">
+  <div class="container py-3 d-flex justify-content-between align-items-center">
+    <div class="brand">MacroChef</div>
+
+    <select id="language" class="form-select" style="width:auto">
+      <option value="da">Dansk</option>
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="nl">Nederlands</option>
+      <option value="sv">Svenska</option>
+      <option value="no">Norsk</option>
+      <option value="fi">Suomi</option>
+      <option value="pl">Polski</option>
+      <option value="pt">Português</option>
+      <option value="tr">Türkçe</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+      <option value="zh">中文</option>
+      <option value="ar">العربية</option>
+    </select>
+  </div>
+</nav>
+
+<main class="container">
+
+<section class="hero">
+  <h1>Eat better.<br>Build your plan.</h1>
+  <p>
+    Find protein-rich meals, balanced dishes and filling recipes
+    based on your selected goal.
+  </p>
+</section>
+
+<section class="filter-box">
+
+  <div class="mb-4">
+    <h5 class="section-title">Goal</h5>
+
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn-goal active" data-goal="Bulk">Bulk</button>
+      <button class="btn-goal" data-goal="Maintain">Maintain</button>
+      <button class="btn-goal" data-goal="Cut">Cut</button>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <h5 class="section-title">Meal</h5>
+
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn-goal active" data-category="All">All</button>
+      <button class="btn-goal" data-category="Breakfast">Breakfast</button>
+      <button class="btn-goal" data-category="Lunch">Lunch</button>
+      <button class="btn-goal" data-category="Dinner">Dinner</button>
+      <button class="btn-goal" data-category="Snacks">Snacks</button>
+      <button class="btn-goal" data-category="Protein Shakes">Protein Shakes</button>
+    </div>
+  </div>
+
+  <input
+    id="search"
+    class="form-control form-control-lg"
+    placeholder="Search recipes..."
+  >
+
+</section>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="section-title mb-0">Recipes</h2>
+  <span id="recipeCount" class="text-secondary"></span>
+</div>
+
+<div id="recipes" class="row g-4"></div>
+
+<section class="mt-5">
+  <h2 class="section-title">Meal Planner</h2>
+
+  <div class="planner">
+    <div id="planner"></div>
+    <button id="clearPlanner" class="btn btn-outline-success mt-2">
+      Clear planner
+    </button>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    MacroChef nutrition values are calculated from the ingredient reference
+    database in this app. Actual values can vary by brand, product and preparation.
+  </div>
+</footer>
+
+
+<div class="modal fade" id="recipeModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTitle" class="modal-title fw-bold"></h2>
+          <div id="modalTags" class="tags mb-0"></div>
+        </div>
+
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal">
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="macro-grid mb-4" id="modalMacros"></div>
+
+        <h5 class="fw-bold">Ingredients</h5>
+        <div id="modalIngredients" class="mb-4"></div>
+
+        <h5 class="fw-bold">Method</h5>
+        <div id="modalMethod"></div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+/* =========================================================
+   MACROCHEF FOOD DATABASE
+   Values are reference values per 100 g.
+========================================================= */
+
+const foods = {
+
+  chicken:      {kcal:120,p:23,c:0,f:2.6},
+  turkey:       {kcal:135,p:29,c:0,f:1.6},
+  beef:         {kcal:172,p:26,c:0,f:7},
+  salmon:       {kcal:208,p:20,c:0,f:13},
+  tuna:         {kcal:132,p:28,c:0,f:1.3},
+  cod:          {kcal:82,p:18,c:0,f:.7},
+
+  egg:          {kcal:143,p:12.6,c:.7,f:9.5},
+  eggwhite:     {kcal:52,p:10.9,c:.7,f:.2},
+
+  skyr:         {kcal:63,p:11,c:4,f:.2},
+  greek:        {kcal:97,p:9,c:3.9,f:5},
+  milk:         {kcal:61,p:3.2,c:4.8,f:3.3},
+  cottage:      {kcal:98,p:11.1,c:3.4,f:4.3},
+
+  oats:         {kcal:389,p:16.9,c:66.3,f:6.9},
+  rice:         {kcal:130,p:2.7,c:28.2,f:.3},
+  pasta:        {kcal:158,p:5.8,c:30.9,f:.9},
+  potato:       {kcal:77,p:2,c:17.5,f:.1},
+  sweetpotato:  {kcal:86,p:1.6,c:20.1,f:.1},
+
+  bread:        {kcal:247,p:13,c:41,f:4.2},
+  tortilla:     {kcal:310,p:8,c:52,f:8},
+
+  banana:       {kcal:89,p:1.1,c:22.8,f:.3},
+  apple:        {kcal:52,p:.3,c:13.8,f:.2},
+  berries:      {kcal:50,p:.7,c:12,f:.3},
+  strawberry:   {kcal:32,p:.7,c:7.7,f:.3},
+
+  broccoli:     {kcal:34,p:2.8,c:6.6,f:.4},
+  spinach:      {kcal:23,p:2.9,c:3.6,f:.4},
+  tomato:       {kcal:18,p:.9,c:3.9,f:.2},
+  cucumber:     {kcal:15,p:.7,c:3.6,f:.1},
+  pepper:       {kcal:31,p:1,c:6,f:.3},
+  carrot:       {kcal:41,p:.9,c:9.6,f:.2},
+  onion:        {kcal:40,p:1.1,c:9.3,f:.1},
+  corn:         {kcal:86,p:3.3,c:19,f:1.4},
+
+  avocado:      {kcal:160,p:2,c:8.5,f:14.7},
+  peanut:       {kcal:588,p:25.1,c:20,f:50},
+  almonds:      {kcal:579,p:21.2,c:21.6,f:49.9},
+  walnuts:      {kcal:654,p:15.2,c:13.7,f:65.2},
+
+  oil:          {kcal:884,p:0,c:0,f:100},
+  honey:        {kcal:304,p:.3,c:82.4,f:0},
+  chia:         {kcal:486,p:16.5,c:42.1,f:30.7},
+  cocoa:        {kcal:228,p:19.6,c:57.9,f:13.1},
+
+  protein:      {kcal:390,p:75,c:8,f:6}
+};
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function ing(food, grams, name){
+  return {
+    food,
+    grams,
+    name: name || food
+  };
+}
+
+function calc(ingredients){
+
+  const total = {
+    kcal:0,
+    p:0,
+    c:0,
+    f:0
+  };
+
+  ingredients.forEach(i => {
+
+    const food = foods[i.food];
+
+    if(!food) return;
+
+    const factor = i.grams / 100;
+
+    total.kcal += food.kcal * factor;
+    total.p    += food.p * factor;
+    total.c    += food.c * factor;
+    total.f    += food.f * factor;
+  });
+
+  return {
+    kcal:Math.round(total.kcal),
+    p:Math.round(total.p*10)/10,
+    c:Math.round(total.c*10)/10,
+    f:Math.round(total.f*10)/10
+  };
+}
+
+
+function recipe(name, category, goals, ingredients, method){
+
+  return {
+    id:crypto.randomUUID(),
+    name,
+    category,
+    goals,
+    ingredients,
+    method,
+    nutrition:calc(ingredients)
+  };
+}
+
+
+/* =========================================================
+   RECIPES
+========================================================= */
+
+const recipes = [];
+
+
+/* ---------------- BREAKFAST ---------------- */
+
+const breakfasts = [
+
+["Chicken Egg Breakfast","Bulk",[
+  ing("egg",150,"Egg"),
+  ing("chicken",100,"Chicken breast"),
+  ing("bread",80,"Whole wheat bread"),
+  ing("tomato",100,"Tomato")
+]],
+
+["Turkey Egg Toast","Maintain",[
+  ing("egg",100,"Egg"),
+  ing("turkey",100,"Turkey breast"),
+  ing("bread",70,"Whole wheat bread"),
+  ing("spinach",50,"Spinach")
+]],
+
+["Salmon Egg Toast","Bulk",[
+  ing("egg",100,"Egg"),
+  ing("salmon",100,"Salmon"),
+  ing("bread",80,"Whole wheat bread"),
+  ing("avocado",50,"Avocado")
+]],
+
+["Protein Oat Bowl","Bulk",[
+  ing("oats",70,"Oats"),
+  ing("milk",250,"Milk"),
+  ing("protein",30,"Protein powder"),
+  ing("banana",100,"Banana")
+]],
+
+["Berry Protein Oats","Maintain",[
+  ing("oats",60,"Oats"),
+  ing("skyr",200,"Skyr"),
+  ing("berries",100,"Mixed berries"),
+  ing("honey",15,"Honey")
+]],
+
+["Banana Peanut Oats","Bulk",[
+  ing("oats",80,"Oats"),
+  ing("milk",250,"Milk"),
+  ing("banana",120,"Banana"),
+  ing("peanut",25,"Peanut butter")
+]],
+
+["Strawberry Skyr Bowl","Cut",[
+  ing("skyr",250,"Skyr"),
+  ing("strawberry",150,"Strawberries"),
+  ing("oats",35,"Oats"),
+  ing("honey",10,"Honey")
+]],
+
+["Cottage Cheese Toast","Maintain",[
+  ing("bread",80,"Whole wheat bread"),
+  ing("cottage",150,"Cottage cheese"),
+  ing("tomato",100,"Tomato"),
+  ing("egg",50,"Egg")
+]],
+
+["Avocado Egg Toast","Maintain",[
+  ing("bread",80,"Whole wheat bread"),
+  ing("egg",100,"Egg"),
+  ing("avocado",60,"Avocado"),
+  ing("tomato",80,"Tomato")
+]],
+
+["Turkey Avocado Sandwich","Bulk",[
+  ing("bread",100,"Whole wheat bread"),
+  ing("turkey",120,"Turkey breast"),
+  ing("avocado",50,"Avocado"),
+  ing("spinach",30,"Spinach")
+]],
+
+["Chocolate Protein Oats","Bulk",[
+  ing("oats",75,"Oats"),
+  ing("milk",250,"Milk"),
+  ing("protein",30,"Protein powder"),
+  ing("cocoa",10,"Cocoa")
+]],
+
+["Apple Cinnamon Oats","Maintain",[
+  ing("oats",65,"Oats"),
+  ing("milk",250,"Milk"),
+  ing("apple",120,"Apple"),
+  ing("cinnamon",0,"Cinnamon")
+]],
+
+["Greek Yogurt Berry Bowl","Maintain",[
+  ing("greek",250,"Greek yogurt"),
+  ing("berries",120,"Mixed berries"),
+  ing("almonds",20,"Almonds"),
+  ing("honey",10,"Honey")
+]],
+
+["Protein French Toast","Bulk",[
+  ing("bread",100,"Whole wheat bread"),
+  ing("egg",100,"Egg"),
+  ing("milk",100,"Milk"),
+  ing("protein",20,"Protein powder"),
+  ing("banana",80,"Banana")
+]],
+
+["Egg Potato Breakfast","Bulk",[
+  ing("egg",150,"Egg"),
+  ing("potato",200,"Potato"),
+  ing("spinach",50,"Spinach"),
+  ing("tomato",100,"Tomato")
+]]
+
+];
+
+breakfasts.forEach((r,i)=>{
+  recipes.push(recipe(
+    r[0],
+    "Breakfast",
+    [r[1],"Maintain","Cut"],
+    r[2],
+    ["Prepare the ingredients.","Cook until ready.","Combine and serve."]
+  ));
+});
+
+
+/* ---------------- LUNCH ---------------- */
+
+const lunches = [
+
+["Chicken Rice Bowl","Bulk",[
+ ing("chicken",180,"Chicken breast"),
+ ing("rice",250,"Cooked rice"),
+ ing("broccoli",100,"Broccoli"),
+ ing("oil",10,"Olive oil")
+]],
+
+["Turkey Rice Bowl","Maintain",[
+ ing("turkey",180,"Turkey breast"),
+ ing("rice",220,"Cooked rice"),
+ ing("pepper",100,"Bell pepper"),
+ ing("onion",50,"Onion")
+]],
+
+["Salmon Rice Bowl","Bulk",[
+ ing("salmon",160,"Salmon"),
+ ing("rice",220,"Cooked rice"),
+ ing("cucumber",100,"Cucumber"),
+ ing("avocado",50,"Avocado")
+]],
+
+["Tuna Potato Bowl","Cut",[
+ ing("tuna",150,"Tuna"),
+ ing("potato",250,"Potato"),
+ ing("tomato",100,"Tomato"),
+ ing("cucumber",100,"Cucumber")
+]],
+
+["Chicken Pasta","Bulk",[
+ ing("chicken",180,"Chicken breast"),
+ ing("pasta",250,"Cooked pasta"),
+ ing("tomato",120,"Tomato"),
+ ing("spinach",50,"Spinach"),
+ ing("oil",10,"Olive oil")
+]],
+
+["Turkey Pasta Bowl","Maintain",[
+ ing("turkey",170,"Turkey breast"),
+ ing("pasta",220,"Cooked pasta"),
+ ing("broccoli",100,"Broccoli"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Beef Pasta","Bulk",[
+ ing("beef",160,"Lean beef"),
+ ing("pasta",250,"Cooked pasta"),
+ ing("tomato",150,"Tomato"),
+ ing("onion",50,"Onion")
+]],
+
+["Chicken Sweet Potato","Bulk",[
+ ing("chicken",180,"Chicken breast"),
+ ing("sweetpotato",280,"Sweet potato"),
+ ing("broccoli",120,"Broccoli"),
+ ing("oil",10,"Olive oil")
+]],
+
+["Turkey Sweet Potato","Cut",[
+ ing("turkey",180,"Turkey breast"),
+ ing("sweetpotato",220,"Sweet potato"),
+ ing("spinach",80,"Spinach"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Beef Potato Bowl","Maintain",[
+ ing("beef",150,"Lean beef"),
+ ing("potato",250,"Potato"),
+ ing("broccoli",100,"Broccoli"),
+ ing("onion",50,"Onion")
+]],
+
+["Chicken Avocado Wrap","Maintain",[
+ ing("tortilla",80,"Whole wheat tortilla"),
+ ing("chicken",150,"Chicken breast"),
+ ing("avocado",50,"Avocado"),
+ ing("tomato",80,"Tomato"),
+ ing("spinach",30,"Spinach")
+]],
+
+["Turkey Corn Wrap","Bulk",[
+ ing("tortilla",90,"Whole wheat tortilla"),
+ ing("turkey",150,"Turkey breast"),
+ ing("corn",80,"Corn"),
+ ing("tomato",80,"Tomato")
+]],
+
+["Tuna Avocado Wrap","Maintain",[
+ ing("tortilla",80,"Whole wheat tortilla"),
+ ing("tuna",150,"Tuna"),
+ ing("avocado",50,"Avocado"),
+ ing("cucumber",80,"Cucumber")
+]],
+
+["Chicken Corn Rice","Bulk",[
+ ing("chicken",180,"Chicken breast"),
+ ing("rice",250,"Cooked rice"),
+ ing("corn",100,"Corn"),
+ ing("pepper",80,"Bell pepper")
+]],
+
+["Salmon Avocado Rice","Bulk",[
+ ing("salmon",160,"Salmon"),
+ ing("rice",220,"Cooked rice"),
+ ing("avocado",70,"Avocado"),
+ ing("cucumber",100,"Cucumber")
+]],
+
+["Cod Potato Plate","Cut",[
+ ing("cod",200,"Cod"),
+ ing("potato",280,"Potato"),
+ ing("broccoli",150,"Broccoli"),
+ ing("oil",8,"Olive oil")
+]],
+
+["Tuna Pasta Salad","Maintain",[
+ ing("tuna",150,"Tuna"),
+ ing("pasta",220,"Cooked pasta"),
+ ing("tomato",100,"Tomato"),
+ ing("cucumber",100,"Cucumber"),
+ ing("corn",60,"Corn")
+]],
+
+["Chicken Tomato Pasta","Bulk",[
+ ing("chicken",170,"Chicken breast"),
+ ing("pasta",250,"Cooked pasta"),
+ ing("tomato",180,"Tomato"),
+ ing("onion",50,"Onion")
+]],
+
+["Beef Rice Bowl","Bulk",[
+ ing("beef",170,"Lean beef"),
+ ing("rice",250,"Cooked rice"),
+ ing("pepper",100,"Bell pepper"),
+ ing("corn",80,"Corn")
+]],
+
+["Turkey Potato Bowl","Maintain",[
+ ing("turkey",180,"Turkey breast"),
+ ing("potato",250,"Potato"),
+ ing("broccoli",100,"Broccoli"),
+ ing("avocado",40,"Avocado")
+]]
+
+];
+
+lunches.forEach(r=>{
+ recipes.push(recipe(
+   r[0],
+   "Lunch",
+   [r[1],"Maintain","Cut"],
+   r[2],
+   ["Prepare the ingredients.","Cook the protein and carbohydrate source.","Add the vegetables and combine.","Serve."]
+ ));
+});
+
+
+/* ---------------- DINNER ---------------- */
+
+const dinners = [
+
+["Chicken Rice Dinner","Bulk",[
+ ing("chicken",200,"Chicken breast"),
+ ing("rice",280,"Cooked rice"),
+ ing("broccoli",150,"Broccoli"),
+ ing("oil",10,"Olive oil")
+]],
+
+["Salmon Potato Dinner","Maintain",[
+ ing("salmon",170,"Salmon"),
+ ing("potato",280,"Potato"),
+ ing("broccoli",150,"Broccoli")
+]],
+
+["Beef Rice Dinner","Bulk",[
+ ing("beef",180,"Lean beef"),
+ ing("rice",280,"Cooked rice"),
+ ing("pepper",120,"Bell pepper"),
+ ing("onion",60,"Onion")
+]],
+
+["Turkey Pasta Dinner","Maintain",[
+ ing("turkey",190,"Turkey breast"),
+ ing("pasta",260,"Cooked pasta"),
+ ing("tomato",150,"Tomato"),
+ ing("spinach",60,"Spinach")
+]],
+
+["Cod Rice Dinner","Cut",[
+ ing("cod",220,"Cod"),
+ ing("rice",220,"Cooked rice"),
+ ing("broccoli",180,"Broccoli"),
+ ing("oil",8,"Olive oil")
+]],
+
+["Chicken Potato Tray","Bulk",[
+ ing("chicken",200,"Chicken breast"),
+ ing("potato",300,"Potato"),
+ ing("carrot",120,"Carrot"),
+ ing("onion",60,"Onion"),
+ ing("oil",10,"Olive oil")
+]],
+
+["Turkey Sweet Potato Plate","Maintain",[
+ ing("turkey",200,"Turkey breast"),
+ ing("sweetpotato",280,"Sweet potato"),
+ ing("broccoli",150,"Broccoli")
+]],
+
+["Salmon Sweet Potato","Bulk",[
+ ing("salmon",180,"Salmon"),
+ ing("sweetpotato",280,"Sweet potato"),
+ ing("spinach",80,"Spinach"),
+ ing("avocado",40,"Avocado")
+]],
+
+["Beef Potato Skillet","Bulk",[
+ ing("beef",180,"Lean beef"),
+ ing("potato",300,"Potato"),
+ ing("onion",80,"Onion"),
+ ing("pepper",100,"Bell pepper"),
+ ing("oil",8,"Olive oil")
+]],
+
+["Chicken Pasta Bowl","Bulk",[
+ ing("chicken",200,"Chicken breast"),
+ ing("pasta",280,"Cooked pasta"),
+ ing("broccoli",120,"Broccoli"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Tuna Potato Dinner","Cut",[
+ ing("tuna",180,"Tuna"),
+ ing("potato",280,"Potato"),
+ ing("spinach",100,"Spinach"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Cod Sweet Potato Dinner","Cut",[
+ ing("cod",220,"Cod"),
+ ing("sweetpotato",280,"Sweet potato"),
+ ing("broccoli",150,"Broccoli"),
+ ing("oil",8,"Olive oil")
+]],
+
+["Chicken Avocado Rice","Bulk",[
+ ing("chicken",190,"Chicken breast"),
+ ing("rice",280,"Cooked rice"),
+ ing("avocado",60,"Avocado"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Turkey Corn Rice","Bulk",[
+ ing("turkey",200,"Turkey breast"),
+ ing("rice",280,"Cooked rice"),
+ ing("corn",100,"Corn"),
+ ing("pepper",100,"Bell pepper")
+]],
+
+["Salmon Pasta","Bulk",[
+ ing("salmon",170,"Salmon"),
+ ing("pasta",250,"Cooked pasta"),
+ ing("spinach",80,"Spinach"),
+ ing("tomato",120,"Tomato")
+]],
+
+["Beef Sweet Potato Bowl","Bulk",[
+ ing("beef",180,"Lean beef"),
+ ing("sweetpotato",280,"Sweet potato"),
+ ing("broccoli",150,"Broccoli")
+]],
+
+["Chicken Corn Pasta","Bulk",[
+ ing("chicken",190,"Chicken breast"),
+ ing("pasta",260,"Cooked pasta"),
+ ing("corn",100,"Corn"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Turkey Avocado Rice","Maintain",[
+ ing("turkey",190,"Turkey breast"),
+ ing("rice",230,"Cooked rice"),
+ ing("avocado",60,"Avocado"),
+ ing("cucumber",100,"Cucumber")
+]],
+
+["Cod Tomato Rice","Cut",[
+ ing("cod",220,"Cod"),
+ ing("rice",220,"Cooked rice"),
+ ing("tomato",180,"Tomato"),
+ ing("spinach",80,"Spinach")
+]],
+
+["Chicken Broccoli Rice","Cut",[
+ ing("chicken",200,"Chicken breast"),
+ ing("rice",200,"Cooked rice"),
+ ing("broccoli",200,"Broccoli"),
+ ing("oil",5,"Olive oil")
+]]
+
+];
+
+dinners.forEach(r=>{
+ recipes.push(recipe(
+   r[0],
+   "Dinner",
+   [r[1],"Maintain","Cut"],
+   r[2],
+   ["Prepare the ingredients.","Cook the protein source thoroughly.","Cook the carbohydrate source.","Add vegetables and serve."]
+ ));
+});
+
+
+/* ---------------- SNACKS ---------------- */
+
+const snacks = [
+
+["Skyr Banana Snack","Maintain",[
+ ing("skyr",250,"Skyr"),
+ ing("banana",100,"Banana")
+]],
+
+["Greek Yogurt Berries","Cut",[
+ ing("greek",200,"Greek yogurt"),
+ ing("berries",120,"Mixed berries")
+]],
+
+["Cottage Cheese Apple","Maintain",[
+ ing("cottage",200,"Cottage cheese"),
+ ing("apple",150,"Apple")
+]],
+
+["Protein Yogurt Bowl","Bulk",[
+ ing("skyr",250,"Skyr"),
+ ing("protein",25,"Protein powder"),
+ ing("banana",100,"Banana")
+]],
+
+["Peanut Banana Toast","Bulk",[
+ ing("bread",80,"Whole wheat bread"),
+ ing("peanut",25,"Peanut butter"),
+ ing("banana",100,"Banana")
+]],
+
+["Cottage Berry Bowl","Maintain",[
+ ing("cottage",200,"Cottage cheese"),
+ ing("berries",120,"Mixed berries"),
+ ing("honey",10,"Honey")
+]],
+
+["Almond Banana Bowl","Bulk",[
+ ing("skyr",200,"Skyr"),
+ ing("banana",100,"Banana"),
+ ing("almonds",25,"Almonds")
+]],
+
+["Protein Strawberry Bowl","Cut",[
+ ing("skyr",250,"Skyr"),
+ ing("strawberry",150,"Strawberries"),
+ ing("protein",20,"Protein powder")
+]],
+
+["Chocolate Skyr Bowl","Bulk",[
+ ing("skyr",250,"Skyr"),
+ ing("cocoa",10,"Cocoa"),
+ ing("banana",100,"Banana"),
+ ing("honey",10,"Honey")
+]],
+
+["Apple Peanut Snack","Bulk",[
+ ing("apple",180,"Apple"),
+ ing("peanut",25,"Peanut butter")
+]],
+
+["Greek Yogurt Almonds","Maintain",[
+ ing("greek",220,"Greek yogurt"),
+ ing("almonds",20,"Almonds"),
+ ing("berries",80,"Mixed berries")
+]],
+
+["Protein Banana Bowl","Bulk",[
+ ing("skyr",200,"Skyr"),
+ ing("protein",25,"Protein powder"),
+ ing("banana",120,"Banana"),
+ ing("chia",10,"Chia seeds")
+]],
+
+["Cottage Tomato Toast","Maintain",[
+ ing("bread",70,"Whole wheat bread"),
+ ing("cottage",150,"Cottage cheese"),
+ ing("tomato",100,"Tomato")
+]],
+
+["Berry Chia Yogurt","Maintain",[
+ ing("greek",200,"Greek yogurt"),
+ ing("berries",120,"Mixed berries"),
+ ing("chia",15,"Chia seeds")
+]],
+
+["Banana Almond Skyr","Bulk",[
+ ing("skyr",220,"Skyr"),
+ ing("banana",120,"Banana"),
+ ing("almonds",20,"Almonds")
+]],
+
+["Strawberry Cottage Bowl","Cut",[
+ ing("cottage",220,"Cottage cheese"),
+ ing("strawberry",150,"Strawberries")
+]],
+
+["Chocolate Banana Yogurt","Bulk",[
+ ing("greek",220,"Greek yogurt"),
+ ing("banana",120,"Banana"),
+ ing("cocoa",10,"Cocoa")
+]],
+
+["Honey Berry Skyr","Maintain",[
+ ing("skyr",250,"Skyr"),
+ ing("berries",130,"Mixed berries"),
+ ing("honey",15,"Honey")
+]],
+
+["Peanut Protein Yogurt","Bulk",[
+ ing("skyr",250,"Skyr"),
+ ing("peanut",20,"Peanut butter"),
+ ing("protein",20,"Protein powder")
+]],
+
+["Apple Cinnamon Cottage","Cut",[
+ ing("cottage",220,"Cottage cheese"),
+ ing("apple",150,"Apple")
+]]
+
+];
+
+snacks.forEach(r=>{
+ recipes.push(recipe(
+   r[0],
+   "Snacks",
+   [r[1],"Maintain","Cut"],
+   r[2],
+   ["Combine the ingredients.","Mix well.","Serve immediately."]
+ ));
+});
+
+
+/* =========================================================
+   PROTEIN SHAKES
+========================================================= */
+
+const shakes = [
+
+["Chocolate Banana Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",150,"Banana"),
+ ing("protein",35,"Protein powder"),
+ ing("oats",40,"Oats"),
+ ing("cocoa",10,"Cocoa")
+]],
+
+["Strawberry Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("strawberry",180,"Strawberries"),
+ ing("protein",35,"Protein powder"),
+ ing("oats",35,"Oats"),
+ ing("honey",15,"Honey")
+]],
+
+["Peanut Butter Banana Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",150,"Banana"),
+ ing("peanut",30,"Peanut butter"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Berry Skyr Protein Shake",[
+ ing("milk",250,"Milk"),
+ ing("skyr",150,"Skyr"),
+ ing("berries",180,"Mixed berries"),
+ ing("protein",30,"Protein powder"),
+ ing("honey",15,"Honey")
+]],
+
+["Oat Banana Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",160,"Banana"),
+ ing("oats",60,"Oats"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Chocolate Peanut Shake",[
+ ing("milk",300,"Milk"),
+ ing("peanut",30,"Peanut butter"),
+ ing("protein",35,"Protein powder"),
+ ing("cocoa",15,"Cocoa"),
+ ing("banana",100,"Banana")
+]],
+
+["Vanilla Berry Shake",[
+ ing("milk",300,"Milk"),
+ ing("berries",180,"Mixed berries"),
+ ing("protein",35,"Protein powder"),
+ ing("oats",40,"Oats")
+]],
+
+["Skyr Banana Shake",[
+ ing("milk",250,"Milk"),
+ ing("skyr",180,"Skyr"),
+ ing("banana",150,"Banana"),
+ ing("protein",30,"Protein powder")
+]],
+
+["Almond Banana Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",150,"Banana"),
+ ing("almonds",25,"Almonds"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Strawberry Banana Shake",[
+ ing("milk",300,"Milk"),
+ ing("strawberry",150,"Strawberries"),
+ ing("banana",130,"Banana"),
+ ing("protein",35,"Protein powder"),
+ ing("oats",30,"Oats")
+]],
+
+["Chocolate Oat Shake",[
+ ing("milk",300,"Milk"),
+ ing("oats",60,"Oats"),
+ ing("protein",35,"Protein powder"),
+ ing("cocoa",12,"Cocoa"),
+ ing("honey",15,"Honey")
+]],
+
+["Berry Oat Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("berries",180,"Mixed berries"),
+ ing("oats",55,"Oats"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Apple Cinnamon Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("apple",160,"Apple"),
+ ing("oats",45,"Oats"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Peanut Cocoa Shake",[
+ ing("milk",300,"Milk"),
+ ing("peanut",35,"Peanut butter"),
+ ing("protein",35,"Protein powder"),
+ ing("cocoa",15,"Cocoa")
+]],
+
+["Banana Chia Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",150,"Banana"),
+ ing("chia",15,"Chia seeds"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Berry Almond Shake",[
+ ing("milk",300,"Milk"),
+ ing("berries",180,"Mixed berries"),
+ ing("almonds",25,"Almonds"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Chocolate Strawberry Shake",[
+ ing("milk",300,"Milk"),
+ ing("strawberry",180,"Strawberries"),
+ ing("protein",35,"Protein powder"),
+ ing("cocoa",12,"Cocoa"),
+ ing("oats",35,"Oats")
+]],
+
+["Banana Honey Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",170,"Banana"),
+ ing("honey",20,"Honey"),
+ ing("protein",35,"Protein powder"),
+ ing("oats",35,"Oats")
+]],
+
+["Skyr Berry Oat Shake",[
+ ing("milk",250,"Milk"),
+ ing("skyr",180,"Skyr"),
+ ing("berries",150,"Mixed berries"),
+ ing("oats",45,"Oats"),
+ ing("protein",25,"Protein powder")
+]],
+
+["Peanut Oat Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("oats",60,"Oats"),
+ ing("peanut",25,"Peanut butter"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Almond Cocoa Shake",[
+ ing("milk",300,"Milk"),
+ ing("almonds",25,"Almonds"),
+ ing("cocoa",15,"Cocoa"),
+ ing("banana",120,"Banana"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Strawberry Skyr Shake",[
+ ing("milk",250,"Milk"),
+ ing("skyr",200,"Skyr"),
+ ing("strawberry",180,"Strawberries"),
+ ing("protein",25,"Protein powder")
+]],
+
+["Banana Berry Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",130,"Banana"),
+ ing("berries",150,"Mixed berries"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Chocolate Banana Oat Shake",[
+ ing("milk",300,"Milk"),
+ ing("banana",150,"Banana"),
+ ing("oats",60,"Oats"),
+ ing("cocoa",12,"Cocoa"),
+ ing("protein",35,"Protein powder")
+]],
+
+["Honey Almond Protein Shake",[
+ ing("milk",300,"Milk"),
+ ing("almonds",25,"Almonds"),
+ ing("honey",20,"Honey"),
+ ing("protein",35,"Protein powder"),
+ ing("banana",100,"Banana")
+]]
+
+];
+
+shakes.forEach(r=>{
+  recipes.push(recipe(
+    r[0],
+    "Protein Shakes",
+    ["Bulk","Maintain","Cut"],
+    r[1],
+    [
+      "Add all ingredients to a blender.",
+      "Blend until smooth.",
+      "Add a little more milk if needed.",
+      "Serve immediately."
+    ]
+  ));
+});
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentGoal = "Bulk";
+let currentCategory = "All";
+let searchTerm = "";
+
+let favorites =
+  JSON.parse(localStorage.getItem("macrochefFavorites") || "[]");
+
+let planner =
+  JSON.parse(localStorage.getItem("macrochefPlanner") || "[]");
+
+
+/* =========================================================
+   RENDER RECIPES
+========================================================= */
+
+function renderRecipes(){
+
+  const container = document.getElementById("recipes");
+
+  const filtered = recipes.filter(r => {
+
+    const goalMatch =
+      r.goals.includes(currentGoal);
+
+    const categoryMatch =
+      currentCategory === "All" ||
+      r.category === currentCategory;
+
+    const searchMatch =
+      r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return goalMatch && categoryMatch && searchMatch;
+  });
+
+  document.getElementById("recipeCount").textContent =
+    `${filtered.length} recipes`;
+
+  if(!filtered.length){
+    container.innerHTML = `
+      <div class="col-12">
+        <div class="empty">
+          <h4>No recipes found</h4>
+          <p>Try another search or category.</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(r => {
+
+    const fav = favorites.includes(r.id);
+
+    return `
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="recipe-card" onclick="openRecipe('${r.id}')">
+
+          <div class="recipe-top">
+            <h3>${r.name}</h3>
+
+            <button
+              class="favorite ${fav ? "active":""}"
+              onclick="event.stopPropagation();toggleFavorite('${r.id}')">
+              ${fav ? "★":"☆"}
+            </button>
+          </div>
+
+          <div class="tags">
+            <span class="tag">${r.category}</span>
+            <span class="tag">${currentGoal}</span>
+          </div>
+
+          <div class="macro-grid">
+            <div class="macro">
+              <strong>${r.nutrition.kcal}</strong>
+              <span>kcal</span>
+            </div>
+
+            <div class="macro">
+              <strong>${r.nutrition.p}g</strong>
+              <span>protein</span>
+            </div>
+
+            <div class="macro">
+              <strong>${r.nutrition.c}g</strong>
+              <span>carbs</span>
+            </div>
+
+            <div class="macro">
+              <strong>${r.nutrition.f}g</strong>
+              <span>fat</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+
+/* =========================================================
+   RECIPE MODAL
+========================================================= */
+
+function openRecipe(id){
+
+  const r = recipes.find(x => x.id === id);
+
+  if(!r) return;
+
+  document.getElementById("modalTitle").textContent = r.name;
+
+  document.getElementById("modalTags").innerHTML = `
+    <span class="tag">${r.category}</span>
+  `;
+
+  document.getElementById("modalMacros").innerHTML = `
+    <div class="macro">
+      <strong>${r.nutrition.kcal}</strong>
+      <span>kcal</span>
+    </div>
+    <div class="macro">
+      <strong>${r.nutrition.p}g</strong>
+      <span>protein</span>
+    </div>
+    <div class="macro">
+      <strong>${r.nutrition.c}g</strong>
+      <span>carbs</span>
+    </div>
+    <div class="macro">
+      <strong>${r.nutrition.f}g</strong>
+      <span>fat</span>
+    </div>
+  `;
+
+  document.getElementById("modalIngredients").innerHTML =
+    r.ingredients
+      .filter(i => i.grams > 0)
+      .map(i => `
+        <div class="ingredient">
+          <span>${i.name}</span>
+          <strong>${i.grams} g</strong>
+        </div>
+      `).join("");
+
+  document.getElementById("modalMethod").innerHTML =
+    r.method.map((step,index)=>`
+      <div class="method-step">
+        <strong>${index+1}.</strong> ${step}
+      </div>
+    `).join("");
+
+  const modal =
+    new bootstrap.Modal(document.getElementById("recipeModal"));
+
+  modal.show();
+
+}
+
+
+/* =========================================================
+   FAVORITES
+========================================================= */
+
+function toggleFavorite(id){
+
+  if(favorites.includes(id)){
+    favorites = favorites.filter(x => x !== id);
+  }else{
+    favorites.push(id);
+  }
+
+  localStorage.setItem(
+    "macrochefFavorites",
+    JSON.stringify(favorites)
+  );
+
+  renderRecipes();
+}
+
+
+/* =========================================================
+   PLANNER
+========================================================= */
+
+function renderPlanner(){
+
+  const box = document.getElementById("planner");
+
+  if(!planner.length){
+
+    box.innerHTML = `
+      <div class="text-secondary">
+        Click a recipe to open it. Planner functionality is ready
+        for your selected meals.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = planner.map((id,index)=>{
+
+    const r = recipes.find(x=>x.id === id);
+
+    if(!r) return "";
+
+    return `
+      <div class="day">
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong>${index+1}. ${r.name}</strong>
+            <div class="small text-secondary">
+              ${r.nutrition.kcal} kcal ·
+              ${r.nutrition.p}g protein ·
+              ${r.nutrition.c}g carbs ·
+              ${r.nutrition.f}g fat
+            </div>
+          </div>
+
+          <button
+            class="btn btn-sm btn-outline-danger"
+            onclick="removePlanner(${index})">
+            Remove
+          </button>
+        </div>
+      </div>
+    `;
+
+  }).join("");
+}
+
+function removePlanner(index){
+
+  planner.splice(index,1);
+
+  localStorage.setItem(
+    "macrochefPlanner",
+    JSON.stringify(planner)
+  );
+
+  renderPlanner();
+}
+
+
+/* =========================================================
+   FILTER BUTTONS
+========================================================= */
+
+document.querySelectorAll("[data-goal]").forEach(btn=>{
+
+  btn.addEventListener("click",()=>{
+
+    document.querySelectorAll("[data-goal]")
+      .forEach(x=>x.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    currentGoal = btn.dataset.goal;
+
+    renderRecipes();
+  });
+
+});
+
+
+document.querySelectorAll("[data-category]").forEach(btn=>{
+
+  btn.addEventListener("click",()=>{
+
+    document.querySelectorAll("[data-category]")
+      .forEach(x=>x.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    currentCategory = btn.dataset.category;
+
+    renderRecipes();
+  });
+
+});
+
+
+document.getElementById("search")
+.addEventListener("input",e=>{
+
+  searchTerm = e.target.value;
+
+  renderRecipes();
+
+});
+
+
+/* =========================================================
+   LANGUAGE
+========================================================= */
+
+const language =
+  document.getElementById("language");
+
+const savedLanguage =
+  localStorage.getItem("macrochefLanguage");
+
+if(savedLanguage){
+  language.value = savedLanguage;
+}
+
+language.addEventListener("change",()=>{
+
+  localStorage.setItem(
+    "macrochefLanguage",
+    language.value
+  );
+
+});
+
+
+/* =========================================================
+   CLEAR PLANNER
+========================================================= */
+
+document.getElementById("clearPlanner")
+.addEventListener("click",()=>{
+
+  planner = [];
+
+  localStorage.removeItem("macrochefPlanner");
+
+  renderPlanner();
+
+});
+
+
+/* =========================================================
+   INITIAL RENDER
+========================================================= */
+
+renderRecipes();
+renderPlanner();
+
+console.log("MacroChef recipes:", recipes.length);
+
+</script>
+
+</body>
+</html>
